@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import javax.activation.MimeType;
+import javax.swing.Spring;
 import javax.validation.Valid;
 
 import org.hibernate.validator.internal.metadata.aggregated.rule.ParallelMethodsMustNotDefineGroupConversionForCascadedReturnValue;
@@ -32,69 +33,93 @@ import com.zaxxer.hikari.pool.HikariProxyDatabaseMetaData;
 @RestController
 @RequestMapping("/api/archivos")
 public class ArchivoController extends CommonController<Archivo, ArchivoServices> {
-	
-	@PostMapping("/crear-archivo")
-	public ResponseEntity<?> crearConArchivo(@Valid Archivo entity,BindingResult result,
-			@RequestParam MultipartFile archivo)
-			throws IOException {
 
-		
+	@PostMapping("/crear-archivo")
+	public ResponseEntity<?> crearConArchivo(@Valid Archivo entity, BindingResult result,
+			@RequestParam MultipartFile archivo) throws IOException {
+
 		if (!archivo.isEmpty()) {
 			entity.setArchivo(archivo.getBytes());
-		}		
-		
+		}
+		System.out.print(archivo.getContentType());
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.save(entity));
 	}
-	
+
 	@PutMapping("/editar-archivo/{id}")
-	public ResponseEntity<?> editarArchivo(@Valid Archivo entity,BindingResult result,@PathVariable Long id,
-			@RequestParam MultipartFile archivo) throws IOException{
-		
-		
+	public ResponseEntity<?> editarArchivo(@Valid Archivo entity, BindingResult result, @PathVariable Long id,
+			@RequestParam MultipartFile archivo) throws IOException {
+
 		Optional<Archivo> o = service.findById(id);
-		
-		if(o.isEmpty()) {
+
+		if (o.isEmpty()) {
 			return ResponseEntity.notFound().build();
 		}
-		
+
 		Archivo archivoDb = o.get();
-		
+
 		archivoDb.setNombre(entity.getNombre());
 		archivoDb.setComentario(entity.getComentario());
 		archivoDb.setTipo(entity.getTipo());
-		
-		if(!archivo.isEmpty()) {
+
+		if (!archivo.isEmpty()) {
 			archivoDb.setArchivo(archivo.getBytes());
 		}
 		System.out.println(archivoDb.getArchivo());
 		service.save(archivoDb);
-		
+
 		return ResponseEntity.status(HttpStatus.CREATED).body(archivoDb);
 	}
 
-	
-	@GetMapping("/uploads/file/{id}")
-	public ResponseEntity<?> verFoto(@PathVariable Long id){
-	
+	@GetMapping("/uploads/file-word/{id}")
+	public ResponseEntity<?> verWord(@PathVariable Long id) {
+
 		Optional<Archivo> o = service.findById(id);
-		
-		if(o.isEmpty() || o.get().getArchivo() == null) {
+
+		if (o.isEmpty() || o.get().getArchivo() == null) {
 			return ResponseEntity.notFound().build();
 		}
-		
 		Resource pdf = new ByteArrayResource(o.get().getArchivo());
-             System.out.print(o.get().getNombre());
-			return ResponseEntity.ok()
-			.contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
-			.body(pdf);
-					
-		
+
+		System.out.print(o.get().getNombre());
+		return ResponseEntity.ok()
+				.contentType(MediaType
+						.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+				.body(pdf);
+
 	}
-	
+
+	@GetMapping("/uploads/file-excel/{id}")
+	public ResponseEntity<?> verExcel(@PathVariable Long id) {
+
+		Optional<Archivo> o = service.findById(id);
+
+		if (o.isEmpty() || o.get().getArchivo() == null) {
+			return ResponseEntity.notFound().build();
+		}
+		Resource pdf = new ByteArrayResource(o.get().getArchivo());
+
+		System.out.print(o.get().getNombre());
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType("application/vnd.ms-excel")).body(pdf);
+
+	}
+
+	@GetMapping("/uploads/file-pdf/{id}")
+	public ResponseEntity<?> verPdf(@PathVariable Long id) {
+
+		Optional<Archivo> o = service.findById(id);
+
+		if (o.isEmpty() || o.get().getArchivo() == null) {
+			return ResponseEntity.notFound().build();
+		}
+		Resource pdf = new ByteArrayResource(o.get().getArchivo());
+
+		System.out.print(o.get().getNombre());
+		return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF).body(pdf);
+	}
+
 	@GetMapping("/tipo/{term}")
-	public ResponseEntity<?> formato(@PathVariable String term){	
+	public ResponseEntity<?> formato(@PathVariable String term) {
 		return ResponseEntity.ok(service.findByTipo(term));
 	}
-	
 
 }
