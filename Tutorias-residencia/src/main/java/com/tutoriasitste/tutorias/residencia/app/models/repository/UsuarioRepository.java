@@ -12,10 +12,10 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long>{
 	
 	public Usuario findByUsername(String username);
 	
-	@Query("select u from Usuario u join fetch u.roles r where r.role='ROLE_DOCENTE'")
+	@Query("select u from Usuario u join fetch u.roles r where r.nombre='ROLE_DOCENTE'")
 	public List<Usuario> findUserRoleDocente();
 	
-	@Query("select u from Usuario u join fetch u.roles r where r.role='ROLE_ALUMNO'")
+	@Query("select u from Usuario u join fetch u.roles r where r.nombre='ROLE_ALUMNO'")
 	public List<Usuario> findUserRoleAlumno();
 
 }

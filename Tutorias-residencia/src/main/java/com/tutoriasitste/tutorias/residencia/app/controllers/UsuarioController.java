@@ -1,6 +1,7 @@
 package com.tutoriasitste.tutorias.residencia.app.controllers;
 
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -8,6 +9,8 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,26 +35,11 @@ public class UsuarioController extends CommonController<Usuario,UsuarioService> 
 	@Autowired
 	public RoleServiceImpl roleService;
 	
-	@PutMapping("/{id}")
-	public ResponseEntity<?> update(@Valid @RequestBody Usuario usuario,BindingResult result,
-			@PathVariable Long id){
+	@Autowired
+	private BCryptPasswordEncoder passwordEncoder;
 
-		if(result.hasErrors()) {
-			return this.validar(result);
-		}
-		
-		Optional<Usuario> o = service.findById(id);
-		if(o.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}
-		
-		Usuario usuarioDb = o.get();
-		usuarioDb.setUsername(usuario.getUsername());
-		usuarioDb.setPassword(usuario.getPassword());
-	    
-	    return ResponseEntity.status(HttpStatus.CREATED).body(service.save(usuarioDb));
-	}
-
+	//crear usuario con el rol escogido
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE","ROLE_ALUMNO"})
 	@PostMapping("/usuario-role/{id}")
 	public ResponseEntity<?> create(@Valid @RequestBody Usuario usuario,BindingResult result,
 			@PathVariable Long id){
@@ -60,6 +48,7 @@ public class UsuarioController extends CommonController<Usuario,UsuarioService> 
 			return this.validar(result);
 		}
 		
+		String passwordBcryp = passwordEncoder.encode(usuario.getPassword());
 		Optional<Role> r = roleService.findById(id); // We found the role_id
 		if(r.isEmpty()) {                            // if role_id is Present, we continue
 			return ResponseEntity.notFound().build();
@@ -73,24 +62,61 @@ public class UsuarioController extends CommonController<Usuario,UsuarioService> 
 		       
         usuario.setArchivo(o);
         */
+        if(roleNew.getNombre().equals("ROLE_ADMIN")) {
+        	
+        	Role roleDocente = roleService.findByNombre("ROLE_DOCENTE");
+        	Role roleAlumno = roleService.findByNombre("ROLE_ALUMNO");
+        	usuario.setPassword(passwordBcryp);
+        	usuario.addRol(roleNew);
+        	usuario.addRol(roleDocente);
+        	usuario.addRol(roleAlumno);
+        	usuario.setEnabled(true);
+        	return  ResponseEntity.status(HttpStatus.CREATED).body(service.save(usuario));
+
+        }
+        usuario.setPassword(passwordBcryp);
         usuario.addRol(roleNew);
+        usuario.setEnabled(true);
 		
 		return  ResponseEntity.status(HttpStatus.CREATED).body(service.save(usuario));
 	}
 	
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE","ROLE_ALUMNO"})
+	@PutMapping("/{id}")
+	public ResponseEntity<?> update(@Valid @RequestBody Usuario usuario,BindingResult result,
+			@PathVariable Long id){
+
+		if(result.hasErrors()) {
+			return this.validar(result);
+		}
+		
+		String passwordBcryp = passwordEncoder.encode(usuario.getPassword());
+		
+		Optional<Usuario> o = service.findById(id);
+		if(o.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		
+		Usuario usuarioDb = o.get();
+		usuarioDb.setUsername(usuario.getUsername());
+		usuarioDb.setPassword(passwordBcryp);
+	    
+	    return ResponseEntity.status(HttpStatus.CREATED).body(service.save(usuarioDb));
+	}	
 	
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE","ROLE_ALUMNO"})
 	@GetMapping("/filtrar/username/{term}")
 	public ResponseEntity<?> filtrarUsuario(@PathVariable String term){
 		return ResponseEntity.ok(service.findByUsername(term));
 	}
-	
-	
-
+		
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE","ROLE_ALUMNO"})
 	@GetMapping("/filtrar/usuarios-role-docente")
 	public ResponseEntity<?> filtrarRoleDocente(){
 		return ResponseEntity.ok(service.findUserRoleDocente());
 	}
 	
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE","ROLE_ALUMNO"})
 	@GetMapping("/filtrar/usuarios-role-alumno")
 	public ResponseEntity<?> filtrarRoleAlumno(){
 		return ResponseEntity.ok(service.findUserRoleAlumno());

@@ -9,4 +9,9 @@ import com.tutoriasitste.tutorias.residencia.commons.services.CommonServiceImpl;
 @Service
 public class RoleServiceImpl extends CommonServiceImpl<Role, RoleRepository> implements RoleService{
 
+	@Override
+	public Role findByNombre(String term) {
+		return repository.findByNombre(term);
+	}
+
 }

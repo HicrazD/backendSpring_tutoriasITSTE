@@ -13,6 +13,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +35,8 @@ import com.zaxxer.hikari.pool.HikariProxyDatabaseMetaData;
 @RequestMapping("/api/archivos")
 public class ArchivoController extends CommonController<Archivo, ArchivoServices> {
 
+	//crear-archivo para admin
+	@Secured({"ROLE_ADMIN"})
 	@PostMapping("/crear-archivo")
 	public ResponseEntity<?> crearConArchivo(@Valid Archivo entity, BindingResult result,
 			@RequestParam MultipartFile archivo) throws IOException {
@@ -45,6 +48,8 @@ public class ArchivoController extends CommonController<Archivo, ArchivoServices
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.save(entity));
 	}
 
+	//editar-archivo
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE"})
 	@PutMapping("/editar-archivo/{id}")
 	public ResponseEntity<?> editarArchivo(@Valid Archivo entity, BindingResult result, @PathVariable Long id,
 			@RequestParam MultipartFile archivo) throws IOException {
@@ -70,6 +75,7 @@ public class ArchivoController extends CommonController<Archivo, ArchivoServices
 		return ResponseEntity.status(HttpStatus.CREATED).body(archivoDb);
 	}
 
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE"})
 	@GetMapping("/uploads/file-word/{id}")
 	public ResponseEntity<?> verWord(@PathVariable Long id) {
 
@@ -87,7 +93,8 @@ public class ArchivoController extends CommonController<Archivo, ArchivoServices
 				.body(pdf);
 
 	}
-
+	
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE"})
 	@GetMapping("/uploads/file-excel/{id}")
 	public ResponseEntity<?> verExcel(@PathVariable Long id) {
 
@@ -102,7 +109,8 @@ public class ArchivoController extends CommonController<Archivo, ArchivoServices
 		return ResponseEntity.ok().contentType(MediaType.parseMediaType("application/vnd.ms-excel")).body(pdf);
 
 	}
-
+	
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE","ROLE_ALUMNO"})
 	@GetMapping("/uploads/file-pdf/{id}")
 	public ResponseEntity<?> verPdf(@PathVariable Long id) {
 
@@ -117,6 +125,7 @@ public class ArchivoController extends CommonController<Archivo, ArchivoServices
 		return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF).body(pdf);
 	}
 
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE"})
 	@GetMapping("/tipo/{term}")
 	public ResponseEntity<?> formato(@PathVariable String term) {
 		return ResponseEntity.ok(service.findByTipo(term));

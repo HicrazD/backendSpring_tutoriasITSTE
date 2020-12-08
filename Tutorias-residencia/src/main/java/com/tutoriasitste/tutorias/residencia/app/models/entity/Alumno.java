@@ -27,7 +27,7 @@ public class Alumno {
 	
 
 	@Column(unique = true)
-	@Min(0)
+	@Min(7)
 	@NotNull
 	private Long matricula;
 	
@@ -55,7 +55,7 @@ public class Alumno {
 	@Max(100)
 	private int promAsistencia;
 	
-	@NotNull
+	//@NotNull
 	@JsonIgnoreProperties({"hibernateLazyInitializer"})
 	@OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
 	private Usuario usuario;

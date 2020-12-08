@@ -11,9 +11,12 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
@@ -34,12 +37,17 @@ public class Usuario {
 	@Column(length = 60)
 	private String password;
 	
+	private Boolean enabled;
+	
 	@JsonIgnoreProperties(value={"usuario","hibernateLazyInitializer", "handler"}, allowSetters=true)
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "usuario",cascade = CascadeType.ALL)
 	private List<Archivo> archivos;
 
 	
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@JoinTable(name="usuarios_roles", joinColumns= @JoinColumn(name="usuario_id"),
+	inverseJoinColumns=@JoinColumn(name="roles_id"),
+	uniqueConstraints= {@UniqueConstraint(columnNames= {"usuario_id", "roles_id"})})
 	private List<Role> roles;
 
 	public Usuario() {		
@@ -102,6 +110,16 @@ public class Usuario {
 
 	public void setArchivos(List<Archivo> archivos) {
 		this.archivos = archivos;
+	}
+
+
+	public Boolean getEnabled() {
+		return enabled;
+	}
+
+
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
 	}
 
     

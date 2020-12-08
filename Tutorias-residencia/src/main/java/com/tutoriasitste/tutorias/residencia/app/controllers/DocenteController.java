@@ -9,6 +9,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,6 +42,7 @@ public class DocenteController extends CommonController<Docente, DocenteService>
 	@Autowired
 	private ArchivoServiceImpl archivoServiceImpl;
 
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE"})
 	@PutMapping("/{id}")
 	public ResponseEntity<?> update(@Valid @RequestBody Docente docente,BindingResult result,
 			@PathVariable Long id) {
@@ -63,6 +65,7 @@ public class DocenteController extends CommonController<Docente, DocenteService>
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.save(docenteDb));
 	}
 
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE"})
 	@PostMapping("/crear/docente-usuario/{term}")
 	public ResponseEntity<?> crearDocente(@Valid @RequestBody Docente docente,BindingResult result,
 			@PathVariable String term) {
@@ -78,14 +81,12 @@ public class DocenteController extends CommonController<Docente, DocenteService>
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.save(docente));
 	}
 
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE"})
 	@PostMapping("/{id}/crear-archivo")
 	public ResponseEntity<?> crearEnUsuario(@Valid Archivo entity,BindingResult result,@PathVariable Long id,
 			@RequestParam MultipartFile archivo) throws IOException {
-
-		if(result.hasErrors()) {
-			return this.validar(result);
-		}
 		
+		System.out.println(entity.getId());
 		if (!archivo.isEmpty()) {
 			entity.setArchivo(archivo.getBytes());
 		}
@@ -97,11 +98,15 @@ public class DocenteController extends CommonController<Docente, DocenteService>
 
 		Docente docenteDb = o.get(); // guardar el docente en docenteDb
 
+		System.out.println(entity.getId());
+		System.out.println(entity.getNombre());
+		System.out.println(entity.getTipo());
 		Usuario usuarioDb = docenteDb.getUsuario(); // obtener el usuario del docente
 		entity.setUsuario(usuarioDb); // en la entity archivo guardar el usuarioDb
-		return ResponseEntity.status(HttpStatus.CREATED).body(archivoServiceImpl.save(entity));
+		return ResponseEntity.status(HttpStatus.CREATED).body(archivoServiceImpl.save(entity));//archivoServiceImpl.save(entity)
 	}
 
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE"})
 	@PutMapping("/{id}/asignar-alumnos")
 	public ResponseEntity<?> asignarAlumnos(@RequestBody List<Alumno> alumnos, @PathVariable Long id) {
 		Optional<Docente> o = service.findById(id);
@@ -118,6 +123,7 @@ public class DocenteController extends CommonController<Docente, DocenteService>
 		return ResponseEntity.status(HttpStatus.CREATED).body(this.service.save(docenteDb));
 	}
 
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE"})
 	@PutMapping("/{id}/eliminar-alumno")
 	public ResponseEntity<?> eliminarAlumno(@RequestBody Alumno alumno, @PathVariable Long id) {
 		Optional<Docente> o = this.service.findById(id);
@@ -131,23 +137,27 @@ public class DocenteController extends CommonController<Docente, DocenteService>
 		return ResponseEntity.status(HttpStatus.CREATED).body(this.service.save(docenteDb));
 	}
 
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE"})
 	@GetMapping("/alumnos/{id}")
 	public ResponseEntity<?> buscarPorAlumnoId(@PathVariable Long id) {
 		Docente docente = service.findDocenteByStudent(id);
 		return ResponseEntity.ok(docente);
 	}
 
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE"})
 	@GetMapping("/filtrar/docente-usuario/{term}")
 	public ResponseEntity<?> filtrarDocenteDeUsuario(@PathVariable String term) {
 		return ResponseEntity.ok(service.findDocenteByUsuarioUsername(term));
 	}
 
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE"})
 	@GetMapping("/filtrar/nombreOrapellido/{term}")
 	public ResponseEntity<?> findNombreOrApellido(@PathVariable String term) {
 
 		return ResponseEntity.ok(service.findByNombreOrApellido(term));
 	}
 	
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE"})
 	// Encontrar por division = division  and nombre or apellido
 	@GetMapping("/filtrar/division/{division}/nombreOrapellido/{term}")
 	public ResponseEntity<?> findDvisionNombreOrApellido(@PathVariable String division,@PathVariable String term) {
@@ -155,7 +165,7 @@ public class DocenteController extends CommonController<Docente, DocenteService>
 		return ResponseEntity.ok(service.findByDivisionIsc(division,term));
 	}
 	
-
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE"})
 	@GetMapping("/ver-archivo/{id}")
 	public ResponseEntity<?> verArchivo(@PathVariable Long id) {
 

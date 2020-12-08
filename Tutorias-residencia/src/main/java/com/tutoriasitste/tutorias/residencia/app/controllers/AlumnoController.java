@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,6 +42,7 @@ public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 	@Autowired
 	private ArchivoServiceImpl archivoServiceImpl;
 	
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE","ROLE_ALUMNO"})
 	@PutMapping("/{id}")
 	public ResponseEntity<?> update(@Valid @RequestBody Alumno alumno,BindingResult result,
 			@PathVariable Long id){
@@ -69,12 +71,14 @@ public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 	}
 	
 	
-	
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE"})
 	@GetMapping("/filtrar/{term}")
 	public ResponseEntity<?> findByNombreOrApellido(@PathVariable String term){
 		return ResponseEntity.ok(service.findByNombreOrApellido(term));
 	}
 	
+	//crear-alumno-usuario
+	@Secured({"ROLE_ADMIN","ROLE_ALUMNO"})
 	@PostMapping("/crear/alumno-usuario/{term}")
 	public ResponseEntity<?> crearAlumno(@Valid @RequestBody Alumno alumno,BindingResult result,
 			@PathVariable String term){
@@ -90,20 +94,19 @@ public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 		return  ResponseEntity.status(HttpStatus.CREATED).body(service.save(alumno));
 	}
 	
+	@Secured({"ROLE_ADMIN","ROLE_ALUMNO"})
 	@GetMapping("/filtrar/alumno-usuario/{term}")
 	public ResponseEntity<?> filtrarAlumnoDeUsuario(@PathVariable String term){
 
 		return ResponseEntity.ok(service.findAlumnoByUsuarioUsername(term));
 	}
     
+	//crear-archivo
+	@Secured({"ROLE_ADMIN"})
 	@PostMapping("/{id}/crear-archivo")
 	public ResponseEntity<?>crearConArchivo(@Valid Archivo entity,BindingResult result,@PathVariable Long id,
 			@RequestParam MultipartFile archivo)
 			throws IOException {
-		
-		if(result.hasErrors()) {
-			return this.validar(result);
-		}
 		
 		if (!archivo.isEmpty()) {
 			entity.setArchivo(archivo.getBytes());
@@ -118,11 +121,13 @@ public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 		Alumno alumnoDb = o.get(); // guardar el alumno en alumnoDb
 		
 		Usuario usuarioDb = alumnoDb.getUsuario();  //obtener el usuario del alumno
-		System.out.println(usuarioDb); 
+		System.out.println(entity.getId()); 
 		entity.setUsuario(usuarioDb);  // en la entity archivo guardar el usuarioDb 
 		return ResponseEntity.status(HttpStatus.CREATED).body(archivoServiceImpl.save(entity));
 	}
 		
+	//ver-archivo
+	@Secured({"ROLE_ADMIN","ROLE_ALUMNO"})
 	@GetMapping("/ver-archivo/{id}")
 	public ResponseEntity<?> verArchivo(@PathVariable Long id){
 	
@@ -130,6 +135,7 @@ public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 	}
 
 	// Buscar alumno por matricula
+	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE"})	
 	@GetMapping("/matricula/{matricula}")
 	public ResponseEntity<?> matricula(@PathVariable Long matricula){
 	

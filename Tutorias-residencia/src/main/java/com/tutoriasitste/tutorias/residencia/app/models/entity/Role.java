@@ -1,5 +1,6 @@
 package com.tutoriasitste.tutorias.residencia.app.models.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,7 +15,8 @@ public class Role {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id; // clave
 	
-	private String role;
+	@Column(unique = true)
+	private String nombre;
 
 	public Long getId() {
 		return id;
@@ -24,12 +26,12 @@ public class Role {
 		this.id = id;
 	}
 
-	public String getRole() {
-		return role;
+	public String getNombre() {
+		return nombre;
 	}
 
-	public void setRole(String role) {
-		this.role = role;
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
 	}
 	
 	
