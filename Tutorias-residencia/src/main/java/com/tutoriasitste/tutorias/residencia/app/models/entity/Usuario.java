@@ -39,6 +39,8 @@ public class Usuario {
 	
 	private Boolean enabled;
 	
+	private Boolean isLog;
+	
 	@JsonIgnoreProperties(value={"usuario","hibernateLazyInitializer", "handler"}, allowSetters=true)
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "usuario",cascade = CascadeType.ALL)
 	private List<Archivo> archivos;
@@ -52,6 +54,7 @@ public class Usuario {
 
 	public Usuario() {		
 		this.archivos = new ArrayList<>();
+		this.isLog = false;
 	}
 
 	
@@ -120,6 +123,16 @@ public class Usuario {
 
 	public void setEnabled(Boolean enabled) {
 		this.enabled = enabled;
+	}
+
+
+	public Boolean getIsLog() {
+		return isLog;
+	}
+
+
+	public void setIsLog(Boolean isLog) {
+		this.isLog = isLog;
 	}
 
     

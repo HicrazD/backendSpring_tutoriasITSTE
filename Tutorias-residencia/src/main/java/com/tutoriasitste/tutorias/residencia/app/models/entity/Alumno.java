@@ -61,6 +61,7 @@ public class Alumno {
 	private Usuario usuario;
 	
 
+
 	public Alumno() {
 		this.usuario = new Usuario();
 	}
@@ -162,7 +163,7 @@ public class Alumno {
 
 	public void setCarrera(String carrera) {
 		this.carrera = carrera;
-	}
+	}	
 	
 	
 	@Override

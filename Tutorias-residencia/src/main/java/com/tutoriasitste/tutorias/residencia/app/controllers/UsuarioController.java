@@ -26,7 +26,7 @@ import com.tutoriasitste.tutorias.residencia.app.services.RoleServiceImpl;
 import com.tutoriasitste.tutorias.residencia.app.services.UsuarioService;
 import com.tutoriasitste.tutorias.residencia.common.controllers.CommonController;
 
-@CrossOrigin(origins = { "http://localhost:4200" })
+@CrossOrigin(origins = { "http://localhost:4200","*" })
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController extends CommonController<Usuario,UsuarioService> {
@@ -50,7 +50,7 @@ public class UsuarioController extends CommonController<Usuario,UsuarioService> 
 		
 		String passwordBcryp = passwordEncoder.encode(usuario.getPassword());
 		Optional<Role> r = roleService.findById(id); // We found the role_id
-		if(r.isEmpty()) {                            // if role_id is Present, we continue
+		if(!r.isPresent()) {                            // if role_id is Present, we continue
 			return ResponseEntity.notFound().build();
 		}
 		
@@ -116,10 +116,31 @@ public class UsuarioController extends CommonController<Usuario,UsuarioService> 
 		return ResponseEntity.ok(service.findUserRoleDocente());
 	}
 	
-	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE","ROLE_ALUMNO"})
 	@GetMapping("/filtrar/usuarios-role-alumno")
 	public ResponseEntity<?> filtrarRoleAlumno(){
 		return ResponseEntity.ok(service.findUserRoleAlumno());
+	}
+	
+	// estos dos ultimos metodos se agregron despues de la subida en geroku
+	// para saber si un usuario estaba logeado o no
+	@GetMapping("/sesion-login/status/{term}")
+	public ResponseEntity<?> sesionLogin(@PathVariable String term){
+		
+		Usuario usuario = service.findByUsername(term);
+		
+		usuario.setIsLog(true);
+		service.save(usuario);
+		return ResponseEntity.ok(usuario);
+	}
+	
+	@GetMapping("/sesion-logout/status/{term}")
+	public ResponseEntity<?> sesionLogOut(@PathVariable String term){
+		
+		Usuario usuario = service.findByUsername(term);
+		
+		usuario.setIsLog(false);
+		service.save(usuario);
+		return ResponseEntity.ok(usuario);
 	}
 
 }

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +31,7 @@ import com.tutoriasitste.tutorias.residencia.app.services.archivos.ArchivoServic
 import com.tutoriasitste.tutorias.residencia.common.controllers.CommonController;
 import com.zaxxer.hikari.pool.HikariProxyDatabaseMetaData;
 
-@CrossOrigin(origins = { "http://localhost:4200" })
+@CrossOrigin(origins = { "http://localhost:4200","*" })
 @RestController
 @RequestMapping("/api/archivos")
 public class ArchivoController extends CommonController<Archivo, ArchivoServices> {
@@ -75,6 +76,31 @@ public class ArchivoController extends CommonController<Archivo, ArchivoServices
 		return ResponseEntity.status(HttpStatus.CREATED).body(archivoDb);
 	}
 
+	
+	//editar-archivo
+		@Secured({"ROLE_ADMIN", "ROLE_DOCENTE"})
+		@PutMapping("/{id}")
+		public ResponseEntity<?> editar(@Valid @RequestBody Archivo entity, BindingResult result, @PathVariable Long id)  {
+
+			if(result.hasErrors()) {
+				return this.validar(result);
+			}
+			
+			Optional<Archivo> o = service.findById(id);
+
+			if (o.isEmpty()) {
+				return ResponseEntity.notFound().build();
+			}
+
+			Archivo archivoDb = o.get();
+
+			archivoDb.setNombre(entity.getNombre());
+			archivoDb.setComentario(entity.getComentario());
+			archivoDb.setTipo(entity.getTipo());
+
+			return ResponseEntity.status(HttpStatus.CREATED).body(service.save(archivoDb));
+		}
+		
 	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE"})
 	@GetMapping("/uploads/file-word/{id}")
 	public ResponseEntity<?> verWord(@PathVariable Long id) {

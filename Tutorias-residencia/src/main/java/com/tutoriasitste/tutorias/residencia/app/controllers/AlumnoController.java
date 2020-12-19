@@ -24,13 +24,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.tutoriasitste.tutorias.residencia.app.models.entity.Alumno;
 import com.tutoriasitste.tutorias.residencia.app.models.entity.Archivo;
+import com.tutoriasitste.tutorias.residencia.app.models.entity.Docente;
 import com.tutoriasitste.tutorias.residencia.app.models.entity.Usuario;
 import com.tutoriasitste.tutorias.residencia.app.services.UsuarioServiceImpl;
 import com.tutoriasitste.tutorias.residencia.app.services.alumnos.AlumnoService;
 import com.tutoriasitste.tutorias.residencia.app.services.archivos.ArchivoServiceImpl;
+import com.tutoriasitste.tutorias.residencia.app.services.docentes.DocenteServiceImpl;
 import com.tutoriasitste.tutorias.residencia.common.controllers.CommonController;
 
-@CrossOrigin(origins = { "http://localhost:4200" })
+@CrossOrigin(origins = { "http://localhost:4200","*" })
 @RestController
 @RequestMapping("/api/alumnos")
 public class AlumnoController extends CommonController<Alumno, AlumnoService> {
@@ -41,6 +43,9 @@ public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 	
 	@Autowired
 	private ArchivoServiceImpl archivoServiceImpl;
+	
+	@Autowired
+	private DocenteServiceImpl docenteServiceImpl;
 	
 	@Secured({"ROLE_ADMIN", "ROLE_DOCENTE","ROLE_ALUMNO"})
 	@PutMapping("/{id}")
@@ -141,4 +146,11 @@ public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 	
 		return ResponseEntity.ok(service.findByMatricula(matricula));
 	}
+	
+	// Buscar docente por alumno
+		@Secured({"ROLE_ADMIN", "ROLE_DOCENTE","ROLE_ALUMNO"})	
+		@GetMapping("/filtrar-docente/alumno/{id}")
+		public ResponseEntity<?> filtrarDocentePorALumno(@PathVariable Long id){
+			return ResponseEntity.ok(docenteServiceImpl.findDocenteByStudent(id));
+		}
 }

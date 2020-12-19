@@ -25,8 +25,13 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 		//.antMatchers(HttpMethod.GET,"/api/alumnos/pagina/**").permitAll()
 		.antMatchers(HttpMethod.GET,"/api/alumnos/pagina/**","/api/usuarios/pagina/**","/api/archivos/pagina/**","/api/docentes/pagina/**").hasAnyRole("ADMIN")
 		.antMatchers(HttpMethod.DELETE, "/api/usuarios/{id}","/api/alumnos/{id}","/api/archivos/{id}","/api/docentes/{id}","/api/roles/{id}").hasAnyRole("ADMIN","DOCENTE","ALUMNO")
+		.antMatchers(HttpMethod.GET, "/api/usuarios/{id}","/api/alumnos/{id}","/api/archivos/{id}","/api/docentes/{id}","/api/roles/{id}").hasAnyRole("ADMIN","DOCENTE","ALUMNO")
 		.antMatchers(HttpMethod.POST, "/api/usuarios/usuario-role/{id}","/api/roles/create/roles").permitAll()
-		.antMatchers(HttpMethod.GET,"/api/roles/filtrar/role-nombre/{term}","/api/roles","/api/roles/pagina/**","/api/archivos/uploads/file-pdf/{id}","/api/archivos/uploads/file-excel/{id}","/api/archivos/uploads/file-word/{id}").permitAll()
+		.antMatchers(HttpMethod.GET,"/api/roles/filtrar/role-nombre/{term}","/api/roles","/api/roles/pagina/**",
+				"/api/archivos/uploads/file-pdf/{id}","/api/archivos/uploads/file-excel/{id}",
+				"/api/archivos/uploads/file-word/{id}","/api/usuarios/filtrar/username/{term}",
+				"/api/usuarios/sesion-login/status/{term}","/api/usuarios/sesion-logout/status/{term}",
+				"/api/examenes/filtrar/{term}","/api/examenes","/api/examenes/{id}").permitAll()
 		/*.antMatchers(HttpMethod.POST, "/api/clientes").hasRole("ADMIN")
 		.antMatchers("/api/clientes/**").hasRole("ADMIN")*/
 		.anyRequest().authenticated()
@@ -36,7 +41,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+		config.setAllowedOrigins(Arrays.asList("http://localhost:4200","*"));
 		config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		config.setAllowCredentials(true);
 		config.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));

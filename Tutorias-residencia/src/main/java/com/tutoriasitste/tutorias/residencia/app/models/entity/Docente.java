@@ -10,6 +10,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -46,11 +47,15 @@ public class Docente {
 	@OneToMany(fetch = FetchType.LAZY)
 	private List<Alumno> alumnos;
 	
+	@ManyToMany(fetch = FetchType.LAZY)
+	private List<Examen> examenes;
+	
 	@NotNull
 	@JsonIgnoreProperties({"hibernateLazyInitializer"})
 	@OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
 	private Usuario usuario;
-
+	
+	
 
 	public Docente() {
 		this.alumnos = new ArrayList<>();
@@ -121,5 +126,19 @@ public class Docente {
 		this.usuario = usuario;
 	}
 	
+	public List<Examen> getExamenes() {
+		return examenes;
+	}
+
+	public void setExamenes(List<Examen> examenes) {
+		this.examenes = examenes;
+	}
+
+	public void addExamen(Examen examen) {
+		this.examenes.add(examen);
+	}
 	
+	public void removeExamen(Examen examen) {
+		this.examenes.remove(examen);
+	}
 }
