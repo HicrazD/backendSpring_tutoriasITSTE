@@ -93,7 +93,7 @@ public class UsuarioController extends CommonController<Usuario,UsuarioService> 
 		String passwordBcryp = passwordEncoder.encode(usuario.getPassword());
 		
 		Optional<Usuario> o = service.findById(id);
-		if(o.isEmpty()) {
+		if(!o.isPresent()) {
 			return ResponseEntity.notFound().build();
 		}
 		

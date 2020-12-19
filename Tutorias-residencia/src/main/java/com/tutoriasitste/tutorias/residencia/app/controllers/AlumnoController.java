@@ -57,7 +57,7 @@ public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 		}
 		
 		Optional<Alumno> o = service.findById(id);
-		if(o.isEmpty()) {
+		if(!o.isPresent()) {
 			return ResponseEntity.notFound().build();
 		}
 		
@@ -113,13 +113,13 @@ public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 			@RequestParam MultipartFile archivo)
 			throws IOException {
 		
-		if (!archivo.isEmpty()) {
+		if (archivo != null) {
 			entity.setArchivo(archivo.getBytes());
 		}		
 		
 		
 		Optional<Alumno> o = service.findById(id); // encontrar el alumno por id
-		if(o.isEmpty()) {
+		if(!o.isPresent()) {
 			return ResponseEntity.notFound().build();
 		}
 		

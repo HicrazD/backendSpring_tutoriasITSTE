@@ -57,7 +57,7 @@ public class DocenteController extends CommonController<Docente, DocenteService>
 		}
 
 		Optional<Docente> o = service.findById(id);
-		if (o.isEmpty()) {
+		if (!o.isPresent()) {  // cambiar para heroku tenia el isEmpty
 			return ResponseEntity.notFound().build();
 		}
 
@@ -92,12 +92,12 @@ public class DocenteController extends CommonController<Docente, DocenteService>
 			@RequestParam MultipartFile archivo) throws IOException {
 
 		System.out.println(entity.getId());
-		if (!archivo.isEmpty()) {
+		if (archivo != null) {   // cambiar para heroku tenia el isEmpty
 			entity.setArchivo(archivo.getBytes());
 		}
 
 		Optional<Docente> o = service.findById(id); // encontrar el docente por id
-		if (o.isEmpty()) {
+		if (!o.isPresent()) {// cambiar para heroku tenia el isEmpty
 			return ResponseEntity.notFound().build();
 		}
 
@@ -115,7 +115,7 @@ public class DocenteController extends CommonController<Docente, DocenteService>
 	@PutMapping("/{id}/asignar-alumnos")
 	public ResponseEntity<?> asignarAlumnos(@RequestBody List<Alumno> alumnos, @PathVariable Long id) {
 		Optional<Docente> o = service.findById(id);
-		if (o.isEmpty()) {
+		if (!o.isPresent()) {    // here  <--------------------
 			return ResponseEntity.notFound().build();
 		}
 

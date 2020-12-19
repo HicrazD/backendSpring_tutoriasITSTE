@@ -42,7 +42,7 @@ public class ArchivoController extends CommonController<Archivo, ArchivoServices
 	public ResponseEntity<?> crearConArchivo(@Valid Archivo entity, BindingResult result,
 			@RequestParam MultipartFile archivo) throws IOException {
 
-		if (!archivo.isEmpty()) {
+		if (archivo != null) { // here <--------------
 			entity.setArchivo(archivo.getBytes());
 		}
 		System.out.print(archivo.getContentType());
@@ -57,7 +57,7 @@ public class ArchivoController extends CommonController<Archivo, ArchivoServices
 
 		Optional<Archivo> o = service.findById(id);
 
-		if (o.isEmpty()) {
+		if (!o.isPresent()) {  // here  <-----
 			return ResponseEntity.notFound().build();
 		}
 
@@ -67,7 +67,7 @@ public class ArchivoController extends CommonController<Archivo, ArchivoServices
 		archivoDb.setComentario(entity.getComentario());
 		archivoDb.setTipo(entity.getTipo());
 
-		if (!archivo.isEmpty()) {
+		if (archivo != null) {
 			archivoDb.setArchivo(archivo.getBytes());
 		}
 		System.out.println(archivoDb.getArchivo());
@@ -88,7 +88,7 @@ public class ArchivoController extends CommonController<Archivo, ArchivoServices
 			
 			Optional<Archivo> o = service.findById(id);
 
-			if (o.isEmpty()) {
+			if (!o.isPresent()) {
 				return ResponseEntity.notFound().build();
 			}
 
@@ -107,7 +107,7 @@ public class ArchivoController extends CommonController<Archivo, ArchivoServices
 
 		Optional<Archivo> o = service.findById(id);
 
-		if (o.isEmpty() || o.get().getArchivo() == null) {
+		if (!o.isPresent() || o.get().getArchivo() == null) {
 			return ResponseEntity.notFound().build();
 		}
 		Resource pdf = new ByteArrayResource(o.get().getArchivo());
@@ -126,7 +126,7 @@ public class ArchivoController extends CommonController<Archivo, ArchivoServices
 
 		Optional<Archivo> o = service.findById(id);
 
-		if (o.isEmpty() || o.get().getArchivo() == null) {
+		if (!o.isPresent() || o.get().getArchivo() == null) {
 			return ResponseEntity.notFound().build();
 		}
 		Resource pdf = new ByteArrayResource(o.get().getArchivo());
@@ -142,7 +142,7 @@ public class ArchivoController extends CommonController<Archivo, ArchivoServices
 
 		Optional<Archivo> o = service.findById(id);
 
-		if (o.isEmpty() || o.get().getArchivo() == null) {
+		if (!o.isPresent() || o.get().getArchivo() == null) {
 			return ResponseEntity.notFound().build();
 		}
 		Resource pdf = new ByteArrayResource(o.get().getArchivo());
